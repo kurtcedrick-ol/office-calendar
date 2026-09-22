@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#021b3a">
+  <title>Office Calendar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to calendar</a>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div id="auth-screen" class="auth-screen hidden">
+    <div class="auth-card">
+      <div class="brand-mark" aria-hidden="true">✦</div>
+      <p class="eyebrow">Office Calendar</p>
+      <h1>Welcome to your calendar</h1>
+      <p class="muted">Sign in to manage your schedule and attachments securely.</p>
+      <form id="auth-form">
+        <label>Email address<input id="auth-email" type="email" autocomplete="email" required></label>
+        <label>Password<input id="auth-password" type="password" autocomplete="current-password" minlength="6" required></label>
+        <button class="btn primary full" id="auth-submit" type="submit">Sign in</button>
+      </form>
+      <button class="text-button" id="auth-toggle" type="button">Need an account? Sign up</button>
+      <p id="auth-message" class="auth-message" role="alert"></p>
+      <p class="tiny muted">Your events are private to your account.</p>
+    </div>
+  </div>
+
+  <div id="app-shell" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">✦</span><div><strong>Office Calendar</strong><small>PLANNING & FOLLOW-UPS</small></div></div>
+      <button id="new-event" class="btn gold full" type="button"><span aria-hidden="true">＋</span> New event</button>
+      <div class="sidebar-section">
+        <p class="section-label">WORKSPACE</p>
+        <button class="nav-item active" data-view="month" type="button">▦ <span>Calendar</span></button>
+        <button class="nav-item" data-view="agenda" type="button">☷ <span>Agenda</span></button>
+        <button class="nav-item" id="jump-today" type="button">◉ <span>Today</span></button>
+        <button class="nav-item" data-view="followups" type="button">✓ <span>Follow-ups</span></button>
+      </div>
+      <div class="sidebar-note"><strong>Keep the day moving.</strong><p>Plan meetings, prepare materials, and track every follow-up in one place.</p></div>
+      <div class="sidebar-bottom"><span id="account-label"></span><button id="sign-out" class="text-button" type="button">Sign out</button></div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar"><div><p class="eyebrow">YOUR OFFICE SCHEDULE</p><h1>Good day<span class="gold-dot">.</span></h1><p id="today-label" class="muted"></p></div><div class="top-actions"><span id="mode-badge" class="mode-badge hidden">DEMO MODE</span><button id="print-button" class="btn outline" type="button">Print schedule</button><button id="mobile-menu" class="icon-btn mobile-only" type="button" aria-label="Toggle menu">☰</button></div></header>
+
+      <main id="main">
+        <section class="summary-grid" aria-label="Schedule overview">
+          <button class="summary-card" data-summary="today" type="button"><span class="summary-icon green">◷</span><span><small>TODAY'S EVENTS</small><strong id="stat-today">0</strong><em>On your agenda</em></span></button>
+          <button class="summary-card" data-summary="upcoming" type="button"><span class="summary-icon gold-tint">▣</span><span><small>UPCOMING</small><strong id="stat-upcoming">0</strong><em>Next 7 days</em></span></button>
+          <button class="summary-card" data-summary="pending" type="button"><span class="summary-icon blue">✓</span><span><small>FOLLOW-UPS</small><strong id="stat-pending">0</strong><em>Still pending</em></span></button>
+          <button class="summary-card" data-summary="overdue" type="button"><span class="summary-icon rose">!</span><span><small>OVERDUE</small><strong id="stat-overdue">0</strong><em>Needs attention</em></span></button>
+        </section>
+
+        <div class="content-grid">
+          <section class="calendar-panel panel">
+            <div class="panel-top"><div><p class="eyebrow">YOUR SCHEDULE</p><h2 id="period-heading"></h2></div><div class="calendar-actions"><button id="prev-period" class="icon-btn" type="button" aria-label="Previous period">‹</button><button id="next-period" class="icon-btn" type="button" aria-label="Next period">›</button><button id="today-button" class="btn small outline" type="button">Today</button><div class="view-switch" role="group" aria-label="Calendar view"><button data-view="month" class="selected" type="button">Month</button><button data-view="week" type="button">Week</button><button data-view="day" type="button">Day</button></div></div></div>
+            <div class="filter-row"><label class="search-wrap"><span class="sr-only">Search events</span><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search events, people, places..."></label><button id="mobile-filter-toggle" class="btn outline mobile-only" type="button" aria-expanded="false" aria-controls="filter-category">Filters</button><select id="filter-category" aria-label="Filter by category"><option value="">All categories</option></select><select id="filter-status" aria-label="Filter by status"><option value="">All statuses</option><option>Scheduled</option><option>Confirmed</option><option>Pending</option><option>Completed</option><option>Cancelled</option></select><select id="filter-priority" aria-label="Filter by priority"><option value="">All priorities</option><option>High</option><option>Normal</option><option>Low</option></select><input id="filter-date" type="date" aria-label="Filter by date"><button id="clear-filters" class="text-button" type="button">Clear</button></div>
+            <div id="calendar-content"></div>
+            <div class="calendar-footer"><span class="legend"><i class="dot meeting"></i> Meeting <i class="dot deadline"></i> Deadline <i class="dot official"></i> Official <i class="dot personal"></i> Other</span><span>Click a date to add an event</span></div>
+          </section>
+
+          <aside class="right-rail">
+            <section class="panel rail-panel"><div class="rail-head"><div><p class="eyebrow">AT A GLANCE</p><h2>Today's agenda</h2></div><span id="agenda-date" class="date-pill"></span></div><div id="today-agenda" class="agenda-list"></div></section>
+            <section class="panel rail-panel"><div class="rail-head"><div><p class="eyebrow">ON THE HORIZON</p><h2>Coming up</h2></div><button id="view-agenda" class="text-button" type="button">View all →</button></div><div id="upcoming-list" class="upcoming-list"></div></section>
+            <section class="tip-card"><span aria-hidden="true">✦</span><div><strong>Planning tip</strong><p>Open an event to keep preparation notes, attachments, and follow-ups together.</p></div></section>
+          </aside>
+        </div>
+      </main>
+    </div>
+    <nav class="mobile-bottom-nav" aria-label="Mobile navigation"><button data-view="month" type="button"><span aria-hidden="true">▦</span>Calendar</button><button data-view="agenda" type="button"><span aria-hidden="true">☷</span>Agenda</button><button id="mobile-today" type="button"><span aria-hidden="true">◉</span>Today</button><button data-view="followups" type="button"><span aria-hidden="true">✓</span>Follow-ups</button></nav>
+    <button id="mobile-add" class="mobile-fab" type="button" aria-label="Add event">＋</button>
+  </div>
+
+  <dialog id="event-dialog" class="event-dialog" aria-labelledby="dialog-title">
+    <form id="event-form" novalidate><div class="dialog-header"><div><p class="eyebrow">SCHEDULE DETAILS</p><h2 id="dialog-title">New event</h2></div><button id="close-dialog" class="icon-btn" type="button" aria-label="Close">×</button></div>
+      <div class="dialog-body"><input id="event-id" type="hidden"><div class="form-grid"><label class="span-2"><span>Event title <span class="required">*</span></span><input id="event-title" maxlength="140" required placeholder="e.g. Coordination meeting"></label><label><span>Date <span class="required">*</span></span><input id="event-date" type="date" required></label><label>End date<input id="event-end-date" type="date"></label><label class="check-row span-2"><input id="event-all-day" type="checkbox"><span>All-day event</span></label><label class="time-field"><span>Start time <span class="required">*</span></span><input id="event-start" type="time" required></label><label class="time-field"><span>End time <span class="required">*</span></span><input id="event-end" type="time" required></label><label>Category<select id="event-category"><option>Meeting</option><option>Deadline</option><option>Official activity</option><option>Appointment</option><option>Personal</option><option>Other</option></select></label><label>Location<input id="event-location" placeholder="Venue or meeting link"></label><label>Priority<select id="event-priority"><option>Normal</option><option>High</option><option>Low</option></select></label><label>Status<select id="event-status"><option>Scheduled</option><option>Confirmed</option><option>Pending</option><option>Completed</option><option>Cancelled</option></select></label><label class="span-2">Attendees / contacts<input id="event-attendees" placeholder="Names or contact details, separated by commas"></label><label class="span-2">Description / agenda<textarea id="event-description" rows="3" placeholder="Purpose, agenda, or instructions"></textarea></label><label class="span-2">Meeting preparation notes<textarea id="event-prep" rows="3" placeholder="Documents to prepare, talking points, logistics"></textarea></label><label class="span-2">Private notes<textarea id="event-notes" rows="2" placeholder="Additional notes"></textarea></label><label>Reminder<select id="event-reminder"><option value="">No reminder</option><option value="5">5 minutes before</option><option value="15">15 minutes before</option><option value="30">30 minutes before</option><option value="60">1 hour before</option><option value="1440">1 day before</option></select></label><label class="check-row span-2 email-option"><input id="event-email-notify" type="checkbox"><span>Email me a reminder</span></label><label id="email-to-wrap" class="span-2 hidden"><span>Send to email address <span class="required">*</span></span><input id="event-email-to" type="email" maxlength="254" autocomplete="email" inputmode="email" placeholder="name@example.com"></label><p id="email-help" class="span-2 email-help hidden">Sent to this address at the reminder time above. Requires Gmail and scheduled job setup; demo mode does not send.</p><label>Repeat<select id="event-repeat"><option value="none">Does not repeat</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select></label><label id="repeat-until-wrap" class="hidden">Repeat until<input id="event-repeat-until" type="date"></label><label>Follow-up due<input id="event-followup-due" type="date"></label><label class="check-row span-2"><input id="event-followup-done" type="checkbox"><span>Follow-up completed</span></label><div class="span-2 attachment-field"><label for="event-images">Images <span class="muted">(JPG, PNG, GIF, WebP; max 5 MB each)</span></label><input id="event-images" type="file" accept="image/jpeg,image/png,image/gif,image/webp" multiple><div id="image-preview" class="image-preview"></div></div></div></div>
+      <div class="dialog-footer"><button id="delete-event" class="btn danger hidden" type="button">Delete event</button><span class="footer-spacer"></span><button id="cancel-event" class="btn outline" type="button">Cancel</button><button id="save-event" class="btn primary" type="submit">Save event</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="print-dialog" class="print-dialog" aria-labelledby="print-title"><div class="dialog-header"><h2 id="print-title">Print schedule</h2><button id="close-print" class="icon-btn" type="button" aria-label="Close">×</button></div><div class="dialog-body"><label>Schedule<input id="print-date" type="date"></label><label>Range<select id="print-range"><option value="day">Daily</option><option value="week">Weekly</option></select></label></div><div class="dialog-footer"><button id="do-print" class="btn primary" type="button">Print</button></div></dialog>
+  <div id="print-sheet" class="print-sheet"></div>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "name": "office-calendar",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {"build": "node scripts/build.mjs", "test": "node --check app.js && node --check scripts/build.mjs && node --check api/send-reminders.js && node --test tests/reminders.test.js"},
+  "dependencies": {"nodemailer": "9.1.1"},
+  "engines": {"node": ">=20"}
+}
